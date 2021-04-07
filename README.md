@@ -6,7 +6,7 @@ Disclaimer: This test is only meant for the MBC3's RTC. It is not for other mapp
 
 # Result
 
-<insert GBI screenshot>
+![GBI00074](https://user-images.githubusercontent.com/50538166/113924512-bc9d8980-979e-11eb-804a-67fe0d539b87.PNG)
 
 # Conclusion
 
