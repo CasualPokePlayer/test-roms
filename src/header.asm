@@ -51,8 +51,8 @@ Reset::
 	dec b
 	jr nz, .copyOAMDMA
 
-	FAIL "Edit to set palettes here"
-	; CGB palettes maybe, DMG ones always
+	ld a,%00001100
+	ld [hBGP],a
 
 	; You will also need to reset your handlers' variables below
 	; I recommend reading through, understanding, and customizing this file
@@ -143,9 +143,8 @@ wShadowOAM::
 	ds NB_SPRITES * 4
 
 
-FAIL "If not using banked WRAM, then replace $D000 with $E000 and delete this line"
 ; This ensures that the stack is at the very end of WRAM
-SECTION "Stack", WRAM0[$D000 - STACK_SIZE]
+SECTION "Stack", WRAM0[$E000 - STACK_SIZE]
 
 	ds STACK_SIZE
 wStackBottom:
