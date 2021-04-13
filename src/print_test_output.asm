@@ -11,6 +11,11 @@ PrintTestOutput::
 	call Memcpy
 
 	ld hl,_SCRN0
+	ld bc,564
+	ld a,$FF
+	rst Memset
+
+	ld hl,_SCRN0
 	ld de,wTestOutput
 	ld c,16
 .loop

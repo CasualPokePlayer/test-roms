@@ -1,3 +1,3 @@
-# test-roms
+# rRAMG MBC3 Test
 
-This repository aims to store all test ROMs created by me. Each one is their own branch in this repository. The gb-starter-kit from ISSOtm is used as a base.
+A simple test to deduce the behavior of the MBC3's RAM gate register.

@@ -10,10 +10,10 @@ PADVALUE := 0xFF
 VERSION := 0
 
 # 4-ASCII letter game ID
-GAMEID := BOIL
+GAMEID := TEST
 
 # Game title, up to 11 ASCII chars
-TITLE := BOILERPLATE
+TITLE := RAMGMBC3   
 
 # New licensee, 2 ASCII chars
 # Homebrew games FTW!
@@ -24,17 +24,17 @@ OLDLIC := 0x33
 # MBC type, tells which hardware is in the cart
 # See https://gbdev.io/pandocs/#_0147-cartridge-type or consult any copy of Pan Docs
 # If using no MBC, consider enabling `-t` below
-MBC := 0x00
+MBC := 0x10
 
 # ROM size is set automatically by RGBFIX
 
 # Size of the on-board SRAM; MBC type should indicate the presence of RAM
 # See https://gbdev.io/pandocs/#_0149-ram-size or consult any copy of Pan Docs
 # Set this to 0 when using MBC2's built-in SRAM
-SRAMSIZE := 0x00
+SRAMSIZE := 0x01
 
 # ROM name
-ROMNAME := boilerplate
+ROMNAME := ramg-mbc3-test
 ROMEXT  := gb
 
 
@@ -57,10 +57,10 @@ ASFLAGS += -h
 # FIXFLAGS += -s
 
 # Game Boy mode
-# LDFLAGS += -d
+LDFLAGS += -d
 
 # No banked WRAM mode
-# LDFLAGS += -w
+LDFLAGS += -w
 
 # 32k mode
 # LDFLAGS += -t
