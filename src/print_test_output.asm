@@ -17,7 +17,7 @@ PrintTestOutput::
 	rst MemcpySmall
 	ld c,16
 	add hl,bc
-	bit 0,h
+	bit 1,h
 	jr z,.loop
 	ld a,LCDCF_ON|LCDCF_BG8000|LCDCF_BGON
 	ldh [hLCDC],a
