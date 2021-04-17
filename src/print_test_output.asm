@@ -12,13 +12,19 @@ PrintTestOutput::
 
 	ld hl,_SCRN0
 	ld de,wTestOutput
-	ld c,16
+	ld bc,18
+	push bc
 .loop
+	ld c,20
 	rst MemcpySmall
-	ld c,16
+	pop bc
+	dec c
+	jr z,.done
+	push bc
+	ld c,12
 	add hl,bc
-	bit 1,h
-	jr z,.loop
+	jr .loop
+.done
 	ld a,LCDCF_ON|LCDCF_BG8000|LCDCF_BGON
 	ldh [hLCDC],a
 	ldh [rLCDC],a
