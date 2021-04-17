@@ -8,4 +8,4 @@ This test aims to study the affects of open bus behavior with disabled/no SRAM i
 
 # Conclusion
 
-Open bus behavior seems to just take the value of the last opcode read. However, it appears this value will quickly degrade over time, pulling up to 0xFF, as seen with pop reads.
+Open bus behavior seems to just take the value of the last opcode/operand read. However, it appears this value will quickly degrade over time, pulling up to 0xFF, as seen with pop reads.
