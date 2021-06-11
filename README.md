@@ -20,4 +20,4 @@ This leaves "banks" 04-07 and 0D-0F never mapping to anything.
 
 The test seems to show that these invalid "banks" appear to produce open bus behavior.
 
-Disclaimer: This test was originally ran within ROM. This produce noticable open bus behavior (i.e. last opcode executed read) with these invalid "banks". The test now does reads from HRAM to consistency read $FF.
+Disclaimer: This test was originally ran within ROM. This produce noticable open bus behavior (i.e. last opcode executed read) with these invalid "banks". The test now does reads from HRAM to consistently read $FF.
