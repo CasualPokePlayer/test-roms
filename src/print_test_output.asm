@@ -10,6 +10,11 @@ PrintTestOutput::
 	ld bc,FontTilesEnd-FontTiles
 	call Memcpy
 
+	ld a,$FE
+	ld hl,_SCRN0
+	ld bc,$A34
+	rst Memset
+
 	ld hl,_SCRN0
 	ld de,wTestOutput
 	ld c,16
@@ -29,5 +34,5 @@ PrintTestOutput::
 SECTION "Font", ROM0
 
 FontTiles:
-INCBIN "test_font.chr"
+INCBIN "font.2bpp"
 FontTilesEnd:

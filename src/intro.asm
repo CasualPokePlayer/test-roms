@@ -1,6 +1,7 @@
 INCLUDE "defines.asm"
 
 CAM_TESTS = 0
+VRAM_OFFSET = 0
 
 cam_test: MACRO
 CamTest\@:
@@ -22,8 +23,11 @@ ENDC
 	inc b
 	wait_vram
 	ld a,b
-	ld [_SCRN0+CAM_TESTS],a
-CAM_TESTS = CAM_TESTS + 1
+	ld [_SCRN0+CAM_TESTS+VRAM_OFFSET+1],a
+CAM_TESTS = CAM_TESTS + 2
+IF CAM_TESTS % 16 == 0 ; next line now
+VRAM_OFFSET = VRAM_OFFSET + 16
+ENDC
 .wait\@
 	ld a,[$A000]
 	and 1
@@ -58,26 +62,124 @@ TestSetup:
 	ld a,[$A000]
 	and 1
 	jr nz,.wait ; just in case
-	ld a,$20
-	ld [$A001],a ; unset n bit, set vh = 1
 	xor a
+	ld [$A001],a ; unset n bit
 	ld [$A002],a ; clear exposure
+	ld a,1
 	ld [$A003],a
 Tests:
-	cam_test 4635+73, 2
-	cam_test 4635+73, 3
-	cam_test 4635+73, 4
-	cam_test 4635+73, 5
-	cam_test 4635+73, 6
-	cam_test 4635+73, 7
-	cam_test 4635+73, 8
+REPT 128
+	cam_test 4635+73, 3+16
+ENDR
+	xor a
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,1
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,2
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,3
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,4
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,5
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,6
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,7
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,8
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,9
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,10
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,11
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,12
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,13
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,14
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
+	ld a,15
+	ld [$4000],a
+	ld a,$FF
+	ld hl,$A000
+	ld bc,$2000
+	call wTestsEnd - (TestsEnd-.memsetloop)
 .lockup
 	jr .lockup
+.memsetloop
+	ld [hli],a
+	dec bc
+	ld a,b
+	or c
+	jr nz,.memsetloop
+	ret
 TestsEnd:
 
-SECTION "Test Output", WRAM0
-wTestOutput::
-	ds 256
+SECTION "Tests WRAM", WRAM0
+wTestOutput:: ; needed for building due to test rom framework, although doesn't matter the size as long as it's cleared out correctly (256 bytes)
 
 wTestsStart:
 	ds TestsEnd-TestsStart
@@ -85,15 +187,13 @@ wTestsEnd:
 
 SECTION "Intro", ROMX
 Intro::
-	xor a
+	ld a,$FF
 	ld hl,wTestOutput
-	ld c,a
+	ld c,$00
 	rst MemsetSmall
 	call PrintTestOutput
 	ld hl,wTestsStart
 	ld de,TestsStart
 	ld bc,TestsEnd-TestsStart
 	call Memcpy
-	jp wTestsStart
-	
-	
+	jp wTestsStart	
