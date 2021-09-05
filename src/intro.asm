@@ -27,6 +27,9 @@ ENDR
 	xor a
 	ld c,a
 	rst MemsetSmall
+	ld hl,_SCRN0
+	ld bc,$234
+	call LCDMemset
 Test:
 	ld hl,wTestOutput
 REPT 8
@@ -46,6 +49,15 @@ REPT 8
 ENDR
 REPT 8
 	test_joyp $00, $10
+ENDR
+REPT 8
+	test_joyp $00, $00
+ENDR
+REPT 8
+	test_joyp $10, $10
+ENDR
+REPT 8
+	test_joyp $20, $20
 ENDR
 	ei
 	call PrintTestOutput
