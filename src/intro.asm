@@ -14,7 +14,6 @@ ENDM
 
 SECTION "Intro", ROMX
 Intro::
-; Put your code here!
 InitTest:
 	di
 	ld hl,MLT_REQ_PACKET
