@@ -54,8 +54,6 @@ Reset::
 	ld a,%00001100
 	ld [hBGP],a
 
-	; CGB palettes maybe, DMG ones always
-
 	; You will also need to reset your handlers' variables below
 	; I recommend reading through, understanding, and customizing this file
 	; in its entirety anyways. This whole file is the "global" game init,
