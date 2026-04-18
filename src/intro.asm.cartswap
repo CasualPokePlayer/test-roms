@@ -1,0 +1,235 @@
+INCLUDE "defines.asm"
+
+rRTCL EQU $6000 ; rtc latch
+TestOutputLength EQU 416
+
+SECTION "Test Output", WRAM0
+wTestOutput::
+	ds TestOutputLength
+
+SECTION "Intro", ROMX
+
+Intro::
+	di
+	xor a
+	ldh [rLCDC],a
+	ld de,Test
+	ld hl,wTest
+	ld bc,TestEnd-Test
+	call Memcpy
+	ld de,FontTiles
+	ld hl,vFontTiles
+	ld bc,FontTilesEnd-FontTiles
+	call Memcpy
+	ld de,PrintTestOutput
+	ld hl,wPrintTestOutput
+	ld bc,PrintTestOutput.end-PrintTestOutput
+	call Memcpy
+	ld de,SwapCarts
+	ld hl,hSwapCarts
+	ld bc,SwapCarts.end-SwapCarts
+	call Memcpy
+	ld hl,wTestOutput
+	ld bc,TestOutputLength
+	ld a,$FF
+	call Memset
+	call PrintTestOutput
+	ld hl,randstate
+	xor a
+	ld [hli],a
+	ld [hli],a
+	ld [hli],a
+	ld [hl],a
+	ldh [rIE],a
+	ldh [rIF],a
+	ldh [rP1],a
+	jp hSwapCarts
+
+SwapCarts:
+	ld a,[rP1]
+	cpl
+	and a,$0F
+	jr z,SwapCarts
+	cp a,$0F
+	jr z,SwapCarts
+	jp wTest
+.end
+
+;;
+; Sets the random seed to BC.
+; C expects startup code to behave as if srand(1) was called.
+; AHL trashed
+Srand:
+	ld hl,wRandState+3
+	xor a
+	ld [hl-],a
+	ld [hl-],a
+	ld a,b
+	ld [hl-],a
+	ld [hl],c
+	ret
+
+Test:
+TestMain:
+	ld a,CART_SRAM_ENABLE
+	ld [rRAMG],a
+	;ld bc,_SRAM
+	;ld de,rRAMB
+	;ld a,$08
+REPT 5
+	;ld [de],a
+	;push af
+	;xor a
+	;ld [bc],a
+	;pop af
+	;inc a
+ENDR
+	;xor a
+	;ld [rRTCL],a
+	;inc a
+	;ld [rRTCL],a
+	;xor a
+	;ldh [rIF],a
+	ld hl,wTestOutput
+REPT 52
+	ld b,60
+.wait_vblank_loop\@
+	ld a,LCDCF_ON
+	ldh [rLCDC],a
+.wait_vblank_loop_inner\@
+	ldh a,[rLY]
+	cp SCRN_Y
+	jr c,.wait_vblank_loop_inner\@
+	xor a
+	ldh [rLCDC],a
+	dec b
+	jr nz,.wait_vblank_loop\@
+	;ld a,0
+	;ld [rRTCL],a
+	call wReportRTC
+ENDR
+	call wPrintTestOutput
+.hang
+	jr .hang
+.end
+RandomizeRTC:
+	ld bc,_SRAM
+	ld de,rRAMB
+	ld a,$08
+REPT 5
+	ld [de],a
+	push af
+	push bc
+	push de
+	call wRand
+	pop de
+	pop bc
+	ld [bc],a
+	pop af
+	inc a
+ENDR
+	ret
+.end
+ReportRTC:
+	ld bc,_SRAM
+	ld de,rRAMB
+	ld a,$08
+REPT 5
+	ld [de],a
+	push af
+	ld a,[bc]
+	ld [hli],a
+	pop af
+	inc a
+ENDR
+	ret
+.end
+;;
+; Generates a pseudorandom 16-bit integer in BC
+; using the LCG formula from cc65 rand():
+; x[i + 1] = x[i] * 0x01010101 + 0xB3B3B3B3
+; @return A=B=state bits 31-24 (which have the best entropy),
+; C=state bits 23-16, HL trashed
+Rand:
+	; Add 0xB3 then multiply by 0x01010101
+	ld hl, wRandState+0
+	ld a, [hl]
+	add a, $B3
+	ld [hl+], a
+	adc a, [hl]
+	ld [hl+], a
+	adc a, [hl]
+	ld [hl+], a
+	ld c, a
+	adc a, [hl]
+	ld [hl], a
+	ld b, a
+	ret
+.end
+TestEnd:
+
+
+SECTION "Test",WRAM0
+wTest:
+wTestMain:
+	ds TestMain.end-TestMain
+wRandomizeRTC:
+	ds RandomizeRTC.end-RandomizeRTC
+wReportRTC:
+	ds ReportRTC.end-ReportRTC
+wRand:
+	ds Rand.end-Rand
+wTestEnd:
+
+SECTION "Rand State",WRAM0
+wRandState: ds 4
+
+SECTION "Print Test Output", ROM0
+PrintTestOutput:
+	xor a
+	ldh [rLCDC],a
+	ld hl,vTestOutput
+	ld de,wTestOutput
+	ld bc,16 ; change to 18 for full column on screen
+	push bc
+.loop
+	ld c,16 ; change to 20 for full line on screen
+.memcpysmall
+	ld a, [de]
+	ld [hli], a
+	inc de
+	dec c
+	jr nz,.memcpysmall
+	pop bc
+	dec c
+	jr z,.done
+	push bc
+	ld c,16 ; change to 12 for full line on screen
+	add hl,bc
+	jr .loop
+.done
+	ld a,LCDCF_ON|LCDCF_BG8000|LCDCF_BGON
+	ldh [rLCDC],a
+	ret
+.end
+
+SECTION "Font", ROM0
+FontTiles:
+INCBIN "test_font.chr"
+FontTilesEnd:
+
+SECTION "Print Output",WRAM0
+wPrintTestOutput:
+	ds PrintTestOutput.end-PrintTestOutput
+
+SECTION "Font Tiles",VRAM[$8000]
+vFontTiles:
+	ds FontTilesEnd-FontTiles
+
+SECTION "Test Output VRAM",VRAM[$9800]
+vTestOutput:
+	ds 32 * 18
+
+SECTION "Swap Carts",HRAM
+hSwapCarts:
+	ds SwapCarts.end-SwapCarts
