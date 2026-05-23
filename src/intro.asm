@@ -6,7 +6,6 @@ SECTION "Intro", ROMX
 
 Intro::
 ; Put your code here!
-; Put your code here!
 InitTest:
 	ld a,CART_SRAM_ENABLE
 	ld [rRAMG],a
