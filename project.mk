@@ -31,7 +31,7 @@ MBC := 0x10
 # Size of the on-board SRAM; MBC type should indicate the presence of RAM
 # See https://gbdev.io/pandocs/#_0149-ram-size or consult any copy of Pan Docs
 # Set this to 0 when using MBC2's built-in SRAM
-SRAMSIZE := 0x01
+SRAMSIZE := 0x02
 
 # ROM name
 ROMNAME := ramg-mbc3-test
